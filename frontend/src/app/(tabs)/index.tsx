@@ -265,23 +265,29 @@ export default function HomeScreen() {
   };
 
   const startSOSHold = () => {
-    if (sosActive || holdTimer.current) return;
-    holdTriggered.current = false;
-    setIsHolding(true);
-    holdTimer.current = setTimeout(() => {
-      holdTimer.current = null;
-      holdTriggered.current = true;
-      void activateSOS();
-    }, 1500);
-  };
+  if (sosActive || holdTimer.current) return;
 
-  const cancelSOSHold = () => {
-    if (holdTimer.current) {
-      clearTimeout(holdTimer.current);
-      holdTimer.current = null;
-      setIsHolding(false);
-    }
-  };
+  holdTriggered.current = false;
+  setIsHolding(true);
+
+  holdTimer.current = setTimeout(() => {
+    holdTimer.current = null;
+    holdTriggered.current = true;
+    setIsHolding(false);
+    void activateSOS();
+  }, 1500);
+};
+
+const cancelSOSHold = () => {
+  if (holdTimer.current) {
+    clearTimeout(holdTimer.current);
+    holdTimer.current = null;
+  }
+
+  setIsHolding(false);
+};
+
+  
 
   const markLatestAsShared = async () => {
     if (!latestHistoryId) {
@@ -487,35 +493,47 @@ const handleContactCall = async (phone: string) => {
             <View className="mt-7 h-60 w-60 items-center justify-center rounded-full border border-red-500/20 bg-red-500/5">
               <View className="h-52 w-52 items-center justify-center rounded-full border border-red-500/20 bg-red-500/10">
                 <Pressable
-                  onPressIn={startSOSHold}
-                  onPressOut={cancelSOSHold}
-                  disabled={sosActive}
-                  accessibilityRole="button"
-                  accessibilityLabel="Hold to prepare SOS alert"
-                  className={`h-44 w-44 items-center justify-center rounded-full border-4 border-red-200/20 ${
-                    isHolding || sosActive ? "bg-red-700" : "bg-red-600"
-                  }`}
-                  style={{
-                    opacity: sosActive ? 0.75 : 1,
-                    elevation: 10,
-                    shadowColor: "#ef4444",
-                    shadowOpacity: 0.3,
-                    shadowRadius: 18,
-                    shadowOffset: { width: 0, height: 5 },
-                  }}
-                >
-                  <Text className="text-5xl">🚨</Text>
-                  <Text className="mt-2 text-3xl font-black tracking-widest text-white">
-                    SOS
-                  </Text>
-                  <Text className="mt-1 text-[10px] font-extrabold tracking-wider text-red-100">
-                    {sosActive
-                      ? "PROCESSING..."
-                      : isHolding
-                      ? "KEEP HOLDING..."
-                      : "HOLD FOR HELP"}
-                  </Text>
-                </Pressable>
+  onPressIn={startSOSHold}
+  onPressOut={cancelSOSHold}
+  onTouchMove={() => {}}
+  disabled={sosActive}
+  
+  accessibilityRole="button"
+  accessibilityLabel="Hold to prepare SOS alert"
+  className={`h-44 w-44 items-center justify-center rounded-full border-4 border-red-200/20 ${
+    isHolding || sosActive ? "bg-red-700" : "bg-red-600"
+  }`}
+
+  style={{
+     opacity: sosActive ? 0.75 : 1,
+  elevation: 10,
+  shadowColor: "#ef4444",
+  shadowOpacity: 0.3,
+  shadowRadius: 18,
+  shadowOffset: { width: 0, height: 5 },
+
+  // Mobile Chrome touch handling
+  touchAction: "none",
+  userSelect: "none",
+
+
+
+  }}
+>
+  <Text className="text-5xl">🚨</Text>
+
+  <Text className="mt-2 text-3xl font-black tracking-widest text-white">
+    SOS
+  </Text>
+
+  <Text className="mt-1 text-[10px] font-extrabold tracking-wider text-red-100">
+    {sosActive
+      ? "PROCESSING..."
+      : isHolding
+      ? "KEEP HOLDING..."
+      : "HOLD FOR HELP"}
+  </Text>
+</Pressable>
               </View>
             </View>
             <Text className="mt-5 text-center text-xs leading-5 text-slate-500">
